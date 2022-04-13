@@ -79,7 +79,7 @@ class Markov {
    */
   makeChain (minLength = this.props.minLength || 10, deepness = 1) {
     if (deepness >= 4) {
-      return "Sorry, I'm not able to generate a chain";
+      throw new Error("Sorry, I'm not able to generate a chain");
     }
     let word = this.choice(this.startWords);
     let chain = [];
