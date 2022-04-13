@@ -19,7 +19,7 @@ class Markov {
       throw new Error('input was empty!')
     }
     this.startWords = []
-    this.wordStats = {}
+    this.wordStats = new Map();
 
     this.props.input.forEach((learningElement) => {
       let words = learningElement.split(' ')
@@ -54,24 +54,24 @@ class Markov {
         // otherwise, create the property on this.startWords and set it to an array containing the next word in the sentence
         // first check to see if there even IS a next word
         // we store all of the keys in this.wordStats as lowercase to make the function makeChain case insensitive
-        if (this.wordStats.hasOwnProperty(currentWord.toLowerCase())) {
-          this.wordStats[currentWord.toLowerCase()].push(nextWord)
+        if (this.wordStats.has(currentWord.toLowerCase())) {
+          this.wordStats.get(currentWord.toLowerCase()).push(nextWord)
         } else {
-          this.wordStats[currentWord.toLowerCase()] = [nextWord]
+          this.wordStats.set(currentWord.toLowerCase(), [nextWord]);
         }
         // TODO change for order n
         if (previousWord) {
           const orderTwoWord = (previousWord + ' ' + currentWord).toLowerCase();
-          if (this.wordStats.hasOwnProperty(orderTwoWord)) {
-            this.wordStats[orderTwoWord].push(nextWord)
+          if (this.wordStats.has(orderTwoWord)) {
+            this.wordStats.get(orderTwoWord).push(nextWord);
           } else {
-            this.wordStats[orderTwoWord] = [nextWord]
+            this.wordStats.set(orderTwoWord, [nextWord]);
           }
         }
       })
     })
 
-    delete this.wordStats['']
+    this.wordStats.delete('');
   }
 
   /**
@@ -89,21 +89,21 @@ class Markov {
    * @return {string} The generated string
    */
   makeChain (minLength = this.props.minLength || 10, deepness = 1) {
-    if (deepness >= 4) {
+    if (deepness >= 5) {
       throw new Error("Sorry, I'm not able to generate a chain");
     }
     let word = this.choice(this.startWords);
     let chain = [];
     let previousWord = null;
     let possibleNextWords;
-    while (word != null && this.wordStats.hasOwnProperty(word)) {
+    while (word != null && this.wordStats.has(word.toLowerCase())) {
       let orderTwoWord = (previousWord + ' ' + word).toLowerCase();
       chain.push(word);
-      if (deepness <= 3 && previousWord && this.wordStats.hasOwnProperty(orderTwoWord)) {
+      if (deepness <= 3 && previousWord && this.wordStats.has(orderTwoWord)) {
         console.log('Order 2 logic achieved');
-        possibleNextWords = this.wordStats[orderTwoWord.toLowerCase()];
+        possibleNextWords = this.wordStats.get(orderTwoWord.toLowerCase());
       } else {
-        possibleNextWords = this.wordStats[word.toLowerCase()];
+        possibleNextWords = this.wordStats.get(word.toLowerCase());
       }
       previousWord = word;
       word = this.choice(possibleNextWords);
