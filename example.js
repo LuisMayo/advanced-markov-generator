@@ -1,7 +1,6 @@
 const MarkovGen = require('./index');
-debugger;
 let markov = new MarkovGen({
-  input: ['array of sentences to base chains on', 'I really like to base my chains on things', 'But base things is sad sometimes'],
+  input: ['array of sentences to base chains on', 'I really like to base my chains on things', 'But base things is sad sometimes', 'to base or not to base'],
   minLength: 1,
   probabilityForFirstWord: true
 });

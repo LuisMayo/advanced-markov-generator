@@ -48,6 +48,8 @@ class Markov {
       // loop through each word in current sentence
       words.forEach((currentWord, it, ar) => {
         const nextWord = ar[it + 1];
+        const previousWord = ar[it - 1];
+
         // if this.wordStats already contains the current word in the sentence as a property, push the next word in the sentence to it's array
         // otherwise, create the property on this.startWords and set it to an array containing the next word in the sentence
         // first check to see if there even IS a next word
@@ -56,6 +58,15 @@ class Markov {
           this.wordStats[currentWord.toLowerCase()].push(nextWord)
         } else {
           this.wordStats[currentWord.toLowerCase()] = [nextWord]
+        }
+        // TODO change for order n
+        if (previousWord) {
+          const orderTwoWord = (previousWord + ' ' + currentWord).toLowerCase();
+          if (this.wordStats.hasOwnProperty(orderTwoWord)) {
+            this.wordStats[orderTwoWord].push(nextWord)
+          } else {
+            this.wordStats[orderTwoWord] = [nextWord]
+          }
         }
       })
     })
@@ -83,10 +94,18 @@ class Markov {
     }
     let word = this.choice(this.startWords);
     let chain = [];
-
-    while (word != null && this.wordStats.hasOwnProperty(word.toLowerCase())) {
+    let previousWord = null;
+    let possibleNextWords;
+    while (word != null && this.wordStats.hasOwnProperty(word)) {
+      let orderTwoWord = (previousWord + ' ' + word).toLowerCase();
       chain.push(word);
-      let possibleNextWords = this.wordStats[word.toLowerCase()];
+      if (deepness <= 3 && previousWord && this.wordStats.hasOwnProperty(orderTwoWord)) {
+        console.log('Order 2 logic achieved');
+        possibleNextWords = this.wordStats[orderTwoWord.toLowerCase()];
+      } else {
+        possibleNextWords = this.wordStats[word.toLowerCase()];
+      }
+      previousWord = word;
       word = this.choice(possibleNextWords);
     }
     if (this.props.input.includes(chain.join(' '))) {
