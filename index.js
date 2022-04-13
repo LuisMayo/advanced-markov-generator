@@ -99,7 +99,10 @@ class Markov {
     while (word != null && this.wordStats.has(word.toLowerCase())) {
       let orderTwoWord = (previousWord + ' ' + word).toLowerCase();
       chain.push(word);
-      if (deepness <= 3 && previousWord && this.wordStats.has(orderTwoWord)) {
+      // If we are too deep we dont want to keep trying order 2 since its harder
+      // also if we dont have that combo registeted we obviously won't use it and we fall bsck to order 1
+      // Finally if the order 2 choices are too few we can't use them anymore
+      if (deepness <= 3 && previousWord && this.wordStats.has(orderTwoWord) && new Set(this.wordStats.get(orderTwoWord)).size > 2) {
         console.log('Order 2 logic achieved');
         possibleNextWords = this.wordStats.get(orderTwoWord.toLowerCase());
       } else {
